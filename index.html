@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Media | Price Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        h1 {
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .tabs button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #333;
+            color: white;
+        }
+        .tabs button:hover {
+            background-color: #555;
+        }
+        .content {
+            display: none;
+        }
+        .content.active {
+            display: block;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="file"],
+        input[type="number"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .price {
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .buy-button {
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .buy-button:hover {
+            background-color: #218838;
+        }
+        .rules,
+        .about,
+        .authors,
+        .online-status,
+        .customization {
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .about {
+            text-align: center;
+        }
+        .online-status {
+            font-size: 18px;
+            text-align: center;
+        }
+        .online-count {
+            font-weight: bold;
+            color: green;
+            transition: transform 0.5s ease;
+        }
+        .online-count.decrease {
+            transform: scaleY(0.9);
+        }
+        .online-count.increase {
+            transform: scaleY(1.1);
+        }
+        .author-list {
+            list-style: none;
+            padding: 0;
+        }
+        .author-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .verified {
+            color: green;
+        }
+        .unverified {
+            color: red;
+        }
+        .customization {
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Sell Your Media | Price Platform</h1>
+</header>
+
+<div class="container">
+    <!-- Информация о проекте -->
+    <div class="about">
+        <h2>About This Project</h2>
+        <p>This project was created on 15.09.2024 to provide a platform for users to sell their media content. Whether you have photos, videos, or audio files, you can upload them here and set your own price.</p>
+        <p>Feel free to customize your media listings and ensure they comply with our rules.</p>
+    </div>
+
+    <!-- Онлайн статус -->
+    <div class="online-status">
+        <h2>Current Online Users:</h2>
+        <span id="onlineCount" class="online-count">0</span>
+    </div>
+
+    <!-- Кастомизация -->
+    <div class="customization">
+        <h2>Customize Your Experience</h2>
+        <form id="customizationForm">
+            <div class="form-group">
+                <label for="bgColor">Background Color:</label>
+                <input type="color" id="bgColor" name="bgColor" value="#f4f4f4">
+            </div>
+            <div class="form-group">
+                <label for="fontColor">Font Color:</label>
+                <input type="color" id="fontColor" name="fontColor" value="#000000">
+            </div>
+            <div class="form-group">
+                <label for="fileUpload">Upload Your Custom File:</label>
+                <input type="file" id="fileUpload" name="fileUpload">
+            </div>
+            <input type="submit" value="Apply Customizations">
+        </form>
+    </div>
+
+    <!-- Правила проекта -->
+    <div class="rules">
+        <h2>Project Rules</h2>
+        <ul>
+            <li>You must not upload copyrighted material that does not belong to you.</li>
+            <li>NSFW (Not Safe For Work) content is strictly prohibited.</li>
+            <li>By uploading content, you agree to comply with these rules and ensure that your content adheres to them.</li>
+        </ul>
+    </div>
+
+    <!-- Вкладки -->
+    <div class="tabs">
+        <button onclick="showContent('upload_photo')">Sell Photo</button>
+        <button onclick="showContent('upload_video')">Sell Video</button>
+        <button onclick="showContent('upload_audio')">Sell Audio</button>
+        <button onclick="showContent('authors')">Different Authors</button>
+    </div>
+
+    <!-- Контент вкладки "Sell Photo" -->
+    <div id="upload_photo" class="content active">
+        <h2>Sell Your Photo</h2>
+        <form action="upload_photo.php" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="photo_title">Title of Photo:</label>
+                <input type="text" id="photo_title" name="photo_title" required>
+            </div>
+            <div class="form-group">
+                <label for="photo_file">Upload Photo:</label>
+                <input type="file" id="photo_file" name="photo_file" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="photo_price">Price (1$ to 100000$):</label>
+                <input type="number" id="photo_price" name="photo_price" min="1" max="100000" required>
+            </div>
+            <input type="submit" value="Upload Photo">
+        </form>
+    </div>
+
+    <!-- Контент вкладки "Sell Video" -->
+    <div id="upload_video" class="content">
+        <h2>Sell Your Video</h2>
+        <form action="upload_video.php" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="video_title">Title of Video:</label>
+                <input type="text" id="video_title" name="video_title" required>
+            </div>
+            <div class="form-group">
+                <label for="video_file">Upload Video:</label>
+                <input type="file" id="video_file" name="video_file" accept="video/*" required>
+            </div>
+            <div class="form-group">
+                <label for="video_price">Price (1$ to 500$):</label>
+                <input type="number" id="video_price" name="video_price" min="1" max="500" required>
+            </div>
+            <input type="submit" value="Upload Video">
+        </form>
+    </div>
+
+    <!-- Контент вкладки "Sell Audio" -->
+    <div id="upload_audio" class="content">
+        <h2>Sell Your Audio</h2>
+        <form action="upload_audio.php" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="audio_title">Title of Audio:</label>
+                <input type="text" id="audio_title" name="audio_title" required>
+            </div>
+            <div class="form-group">
+                <label for="audio_file">Upload Audio:</label>
+                <input type="file" id="audio_file" name="audio_file" accept="audio/*" required>
+            </div>
+            <div class="form-group">
+                <label for="audio_price">Price (1$ to 350$):</label>
+                <input type="number" id="audio_price" name="audio_price" min="1" max="350" required>
+            </div>
+            <input type="submit" value="Upload Audio">
+        </form>
+    </div>
+
+    <!-- Контент вкладки "Different Authors" -->
+    <div id="authors" class="content">
+        <h2>Different Authors</h2>
+        <ul class="author-list">
+            <!-- Пример авторов -->
+            <li class="author-item">Author1 <span class="verified">🟢</span></li>
+            <li class="author-item">Author2 <span class="unverified">🔴</span></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Функция для переключения вкладок
+    function showContent(tab) {
+        // Скрываем все вкладки
+        document.querySelectorAll('.content').forEach(function(content) {
+            content.classList.remove('active');
+        });
+        
+        // Показываем выбранную вкладку
+        document.getElementById(tab).classList.add('active');
+    }
+
+    // Функция для обновления онлайн статуса
+    function updateOnlineStatus() {
+        // Пример: получаем текущее количество пользователей
+        let onlineCount = Math.floor(Math.random() * 100); // Замените на реальное значение
+        let onlineCountElement = document.getElementById('onlineCount');
+        
+        // Анимация изменения числа
+        if (onlineCountElement.innerText < onlineCount) {
+            onlineCountElement.classList.remove('decrease');
+            onlineCountElement.classList.add('increase');
+        } else {
+            onlineCountElement.classList.remove('increase');
+            onlineCountElement.classList.add('decrease');
+        }
+        
+        onlineCountElement.innerText = onlineCount;
+    }
+
+    // Обновляем онлайн статус каждую секунду
+    setInterval(updateOnlineStatus, 1000);
+
+    // Обработка формы кастомизации
+    document.getElementById('customizationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        let bgColor = document.getElementById('bgColor').value;
+        let fontColor = document.getElementById('fontColor').value;
+        
+        document.body.style.backgroundColor = bgColor;
+        document.body.style.color = fontColor;
+        
+        alert('Customizations applied!'); // Простое уведомление о применении изменений
+    });
+</script>
+// Генерация токена в PHP
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+// Ваша форма
+<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">// Пример на PHP для XSS
+echo htmlspecialchars($user_input, ENT_QUOTES, 'UTF-8');// Пример на PHP для SQL-инъекций
+$stmt = $pdo->prepare('INSERT INTO photos (title, price, file) VALUES (?, ?, ?)');
+$stmt->execute([$title, $price, $file]);
+</body>
+</html>
