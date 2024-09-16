@@ -31,6 +31,7 @@
             display: flex;
             justify-content: space-around;
             margin-bottom: 20px;
+            animation: slideIn 0.5s ease-in-out;
         }
         .tabs button {
             padding: 10px 20px;
@@ -39,6 +40,7 @@
             border: none;
             background-color: #333;
             color: white;
+            transition: background-color 0.3s;
         }
         .tabs button:hover {
             background-color: #555;
@@ -61,7 +63,8 @@
         input[type="text"],
         input[type="file"],
         input[type="number"],
-        input[type="submit"] {
+        input[type="submit"],
+        select {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -76,10 +79,12 @@
             background-color: #218838;
         }
         .price {
-            font-family: "Comic Sans MS", cursive, sans-serif;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             font-size: 36px;
             color: #333;
             margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in forwards;
         }
         .buy-button {
             font-size: 20px;
@@ -96,7 +101,6 @@
         .rules,
         .about,
         .authors,
-        .online-status,
         .customization {
             margin-bottom: 30px;
             padding: 10px;
@@ -105,21 +109,6 @@
         }
         .about {
             text-align: center;
-        }
-        .online-status {
-            font-size: 18px;
-            text-align: center;
-        }
-        .online-count {
-            font-weight: bold;
-            color: green;
-            transition: transform 0.5s ease;
-        }
-        .online-count.decrease {
-            transform: scaleY(0.9);
-        }
-        .online-count.increase {
-            transform: scaleY(1.1);
         }
         .author-list {
             list-style: none;
@@ -141,6 +130,33 @@
             background-color: #f9f9f9;
             border: 1px solid #ddd;
         }
+        .recent-list {
+            margin-top: 20px;
+        }
+        .recent-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -157,16 +173,10 @@
         <p>Feel free to customize your media listings and ensure they comply with our rules.</p>
     </div>
 
-    <!-- Онлайн статус -->
-    <div class="online-status">
-        <h2>Current Online Users:</h2>
-        <span id="onlineCount" class="online-count">0</span>
-    </div>
-
     <!-- Кастомизация -->
     <div class="customization">
         <h2>Customize Your Experience</h2>
-        <form id="customizationForm">
+        <form id="customizationForm" method="post">
             <div class="form-group">
                 <label for="bgColor">Background Color:</label>
                 <input type="color" id="bgColor" name="bgColor" value="#f4f4f4">
@@ -176,8 +186,13 @@
                 <input type="color" id="fontColor" name="fontColor" value="#000000">
             </div>
             <div class="form-group">
-                <label for="fileUpload">Upload Your Custom File:</label>
-                <input type="file" id="fileUpload" name="fileUpload">
+                <label for="theme">Select Theme:</label>
+                <select id="theme" name="theme">
+                    <option value="">Default</option>
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                </select>
             </div>
             <input type="submit" value="Apply Customizations">
         </form>
@@ -198,13 +213,16 @@
         <button onclick="showContent('upload_photo')">Sell Photo</button>
         <button onclick="showContent('upload_video')">Sell Video</button>
         <button onclick="showContent('upload_audio')">Sell Audio</button>
+        <button onclick="showContent('recent_photos')">Recent Photos</button>
+        <button onclick="showContent('recent_videos')">Recent Videos</button>
+        <button onclick="showContent('recent_audio')">Recent Audio</button>
         <button onclick="showContent('authors')">Different Authors</button>
     </div>
 
     <!-- Контент вкладки "Sell Photo" -->
     <div id="upload_photo" class="content active">
         <h2>Sell Your Photo</h2>
-        <form action="upload_photo.php" method="post" enctype="multipart/form-data">
+        <form action="generate_photo.php" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="photo_title">Title of Photo:</label>
                 <input type="text" id="photo_title" name="photo_title" required>
@@ -224,7 +242,7 @@
     <!-- Контент вкладки "Sell Video" -->
     <div id="upload_video" class="content">
         <h2>Sell Your Video</h2>
-        <form action="upload_video.php" method="post" enctype="multipart/form-data">
+        <form action="generate_video.php" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="video_title">Title of Video:</label>
                 <input type="text" id="video_title" name="video_title" required>
@@ -244,7 +262,7 @@
     <!-- Контент вкладки "Sell Audio" -->
     <div id="upload_audio" class="content">
         <h2>Sell Your Audio</h2>
-        <form action="upload_audio.php" method="post" enctype="multipart/form-data">
+        <form action="generate_audio.php" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="audio_title">Title of Audio:</label>
                 <input type="text" id="audio_title" name="audio_title" required>
@@ -254,77 +272,107 @@
                 <input type="file" id="audio_file" name="audio_file" accept="audio/*" required>
             </div>
             <div class="form-group">
-                <label for="audio_price">Price (1$ to 350$):</label>
-                <input type="number" id="audio_price" name="audio_price" min="1" max="350" required>
+                <label for="audio_price">Price (1$ to 500$):</label>
+                <input type="number" id="audio_price" name="audio_price" min="1" max="500" required>
             </div>
             <input type="submit" value="Upload Audio">
         </form>
+    </div>
+
+    <!-- Контент вкладки "Recent Photos" -->
+    <div id="recent_photos" class="content">
+        <h2>Recent Photos</h2>
+        <div class="recent-list">
+            <?php
+            // Здесь будет ваш PHP-код для динамического отображения последних фото
+            $photos = glob('uploads/photos/*.html'); // Путь к HTML-файлам с фото
+            foreach ($photos as $photo) {
+                $filename = basename($photo);
+                echo "<div class='recent-item'><a href='uploads/photos/$filename'>Photo - $filename</a></div>";
+            }
+            ?>
+        </div>
+    </div>
+
+    <!-- Контент вкладки "Recent Videos" -->
+    <div id="recent_videos" class="content">
+        <h2>Recent Videos</h2>
+        <div class="recent-list">
+            <?php
+            // Здесь будет ваш PHP-код для динамического отображения последних видео
+            $videos = glob('uploads/videos/*.html'); // Путь к HTML-файлам с видео
+            foreach ($videos as $video) {
+                $filename = basename($video);
+                echo "<div class='recent-item'><a href='uploads/videos/$filename'>Video - $filename</a></div>";
+            }
+            ?>
+        </div>
+    </div>
+
+    <!-- Контент вкладки "Recent Audio" -->
+    <div id="recent_audio" class="content">
+        <h2>Recent Audio</h2>
+        <div class="recent-list">
+            <?php
+            // Здесь будет ваш PHP-код для динамического отображения последнего аудио
+            $audios = glob('uploads/audio/*.html'); // Путь к HTML-файлам с аудио
+            foreach ($audios as $audio) {
+                $filename = basename($audio);
+                echo "<div class='recent-item'><a href='uploads/audio/$filename'>Audio - $filename</a></div>";
+            }
+            ?>
+        </div>
     </div>
 
     <!-- Контент вкладки "Different Authors" -->
     <div id="authors" class="content">
         <h2>Different Authors</h2>
         <ul class="author-list">
-            <!-- Пример авторов -->
-            <li class="author-item">Author1 <span class="verified">🟢</span></li>
-            <li class="author-item">Author2 <span class="unverified">🔴</span></li>
+            <?php
+            // Здесь будет ваш PHP-код для отображения авторов
+            $authors = [
+                ['name' => 'Author 1', 'status' => 'verified'],
+                ['name' => 'Author 2', 'status' => 'unverified']
+            ];
+            foreach ($authors as $author) {
+                echo "<li class='author-item'>{$author['name']} - <span class='{$author['status']}'>{$author['status']}</span></li>";
+            }
+            ?>
         </ul>
     </div>
 </div>
 
 <script>
-    // Функция для переключения вкладок
-    function showContent(tab) {
-        // Скрываем все вкладки
-        document.querySelectorAll('.content').forEach(function(content) {
+    function showContent(id) {
+        var contents = document.querySelectorAll('.content');
+        contents.forEach(function(content) {
             content.classList.remove('active');
         });
-        
-        // Показываем выбранную вкладку
-        document.getElementById(tab).classList.add('active');
-    }
 
-    // Функция для обновления онлайн статуса
-    function updateOnlineStatus() {
-        // Пример: получаем текущее количество пользователей
-        let onlineCount = Math.floor(Math.random() * 100); // Замените на реальное значение
-        let onlineCountElement = document.getElementById('onlineCount');
-        
-        // Анимация изменения числа
-        if (onlineCountElement.innerText < onlineCount) {
-            onlineCountElement.classList.remove('decrease');
-            onlineCountElement.classList.add('increase');
-        } else {
-            onlineCountElement.classList.remove('increase');
-            onlineCountElement.classList.add('decrease');
+        var selectedContent = document.getElementById(id);
+        if (selectedContent) {
+            selectedContent.classList.add('active');
         }
-        
-        onlineCountElement.innerText = onlineCount;
     }
 
-    // Обновляем онлайн статус каждую секунду
-    setInterval(updateOnlineStatus, 1000);
-
-    // Обработка формы кастомизации
+    // Обработка кастомизации
     document.getElementById('customizationForm').addEventListener('submit', function(event) {
         event.preventDefault();
-        
-        let bgColor = document.getElementById('bgColor').value;
-        let fontColor = document.getElementById('fontColor').value;
-        
+        var bgColor = document.getElementById('bgColor').value;
+        var fontColor = document.getElementById('fontColor').value;
+        var theme = document.getElementById('theme').value;
+
         document.body.style.backgroundColor = bgColor;
         document.body.style.color = fontColor;
-        
-        alert('Customizations applied!'); // Простое уведомление о применении изменений
+
+        if (theme) {
+            document.body.style.backgroundColor = theme;
+        }
+
+        alert('Customizations applied!');
     });
 </script>
-// Генерация токена в PHP
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-// Ваша форма
-<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">// Пример на PHP для XSS
-echo htmlspecialchars($user_input, ENT_QUOTES, 'UTF-8');// Пример на PHP для SQL-инъекций
-$stmt = $pdo->prepare('INSERT INTO photos (title, price, file) VALUES (?, ?, ?)');
-$stmt->execute([$title, $price, $file]);
 </body>
 </html>
+
